@@ -4,29 +4,38 @@ from werkzeug.utils import secure_filename
 app=Flask(__name__)
 
 url_list=[]
+num_word=[]
+time=[]
 
 @app.route('/')
 def render_file() : 
-	return render_template('upload.html')
+	return render_template('upload.html', len=0, url_list=url_list, num_word=num_word, time=time)
 
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
 	if request.method=='GET' :
-		text=request.args['url_text']
-		url_list.append(text)
+		if request.args['url_text'] is None :
+			pass
+		else : 
+			text=request.args['url_text']
+			url_list.append(text)
 	elif request.method=='POST' : 
-		f=request.files['url_file'] 
-		f.save(secure_filename(f.filename))
-		fp=open(f.filename, 'r')
-		while True :
-			line=fp.readline().replace("\n", "").replace(" ", "")
-			if not line :
-				break
-			if line in url_list :
-				continue;
-			url_list.append(line)
-		fp.close()
-	return "data : ({})".format(url_list)
+		if request.args['url_text'] is None :
+			pass
+
+		else :
+			f=request.files['url_file'] 
+			f.save(secure_filename(f.filename))
+			fp=open(f.filename, 'r')
+			while True :
+				line=fp.readline().replace("\n", "").replace(" ", "")
+				if not line :
+					break
+				if line in url_list :
+					continue;
+				url_list.append(line)
+			fp.close()
+	return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 		
 
 if __name__=='__main__' : 
