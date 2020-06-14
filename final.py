@@ -17,6 +17,7 @@ es_port = "9200"
 app=Flask(__name__)
 
 url_list=[]
+
 num_word=[]
 time=[]
 
@@ -92,7 +93,7 @@ def upload_file() :
 		count = 0
 		for w,c in sorted(word_d.items(),key=lambda x:x[1], reverse=False):
 			count += c
-
+		num_word.append(count)
 		
 		top_words = []
 		similar_urls = []
