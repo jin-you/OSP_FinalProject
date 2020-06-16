@@ -67,7 +67,7 @@ def search(lst) :
 
 	stop_words = set(stopwords.words('english'))
 	
-	for url in url_list:
+	for url in lst:
 		
 		word_d = {}
 
