@@ -20,6 +20,7 @@ url_list=[]
 
 num_word=[]
 time=[]
+i=0
 
 @app.route('/')
 def render_file() : 
@@ -35,6 +36,9 @@ def upload_file() :
 			pass
 		else : 
 			url_list.append(text)
+			new=[]
+			new.append(text)
+			search(new)
 	elif request.method=='POST' : 
 		f=request.files['url_file']
 		if not f :
@@ -43,6 +47,7 @@ def upload_file() :
 		else : 
 			f.save(secure_filename(f.filename))
 			fp=open(f.filename, 'r')
+			new=[]
 			while True :
 				line=fp.readline().replace("\n", "").replace(" ", "")
 				if not line :
@@ -50,13 +55,18 @@ def upload_file() :
 				if line in url_list :
 					continue;
 				url_list.append(line)
+				new.append(line)
 			fp.close()
-			
+			search(new)
+	return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
+	
+def search(lst) : 
+	global i
+		
 	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
 
 	stop_words = set(stopwords.words('english'))
 	
-	i=0
 	for url in url_list:
 		
 		word_d = {}
@@ -114,7 +124,7 @@ def upload_file() :
 		print(res)
 
 	
-	return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
+	return
 		
 
 if __name__=='__main__' : 
