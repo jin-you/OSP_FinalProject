@@ -28,17 +28,19 @@ def render_file() :
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
 	if request.method=='GET' :
-		if request.args['url_text'] is None :
+		text=request.args['url_text']
+		if not text :
+			pass
+		elif text in url_list : 
 			pass
 		else : 
-			text=request.args['url_text']
 			url_list.append(text)
 	elif request.method=='POST' : 
-		if request.args['url_text'] is None :
+		f=request.files['url_file']
+		if not f :
 			pass
 
-		else :
-			f=request.files['url_file'] 
+		else : 
 			f.save(secure_filename(f.filename))
 			fp=open(f.filename, 'r')
 			while True :
