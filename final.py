@@ -17,28 +17,38 @@ es_port = "9200"
 app=Flask(__name__)
 
 url_list=[]
-
 num_word=[]
 time=[]
 i=0
 
 @app.route('/')
+@app.route('/result')
 def render_file() : 
+	global url_list
+	global num_word
+	global time
 	return render_template('upload.html', len=0, url_list=url_list, num_word=num_word, time=time)
 
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
+	global url_list
+	global time
+	global num_word
+
 	if request.method=='GET' :
 		text=request.args['url_text']
 		if not text :
-			pass
+			dic1[text]="입력값 없음"
 		elif text in url_list : 
-			pass
+			dic1[text]="중복"
 		else : 
 			url_list.append(text)
 			new=[]
 			new.append(text)
 			search(new)
+			dic1[text]="성공"
+		return render_template('result.html', dic=dic1)
+
 	elif request.method=='POST' : 
 		f=request.files['url_file']
 		if not f :
@@ -48,21 +58,26 @@ def upload_file() :
 			f.save(secure_filename(f.filename))
 			fp=open(f.filename, 'r')
 			new=[]
+			dic2={}
 			while True :
 				line=fp.readline().replace("\n", "").replace(" ", "")
 				if not line :
 					break
 				if line in url_list :
+					dic2[line]="중복"
 					continue;
 				url_list.append(line)
 				new.append(line)
+				dic2[line]="성공"
 			fp.close()
 			search(new)
-	return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
+			return render_template('result.html', dic=dic2)
+	#return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 	
 def search(lst) : 
 	global i
-		
+	global num_word
+	
 	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
 
 	stop_words = set(stopwords.words('english'))
