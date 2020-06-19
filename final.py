@@ -8,6 +8,7 @@ from elasticsearch import Elasticsearch
 import nltk
 from nltk import punkt
 from nltk.tokenize import word_tokenize
+from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
 import string
 
@@ -27,7 +28,7 @@ def render_file() :
 	global url_list
 	global num_word
 	global time
-	return render_template('upload.html', len=0, url_list=url_list, num_word=num_word, time=time)
+	return render_template('upload.html', len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
@@ -36,6 +37,7 @@ def upload_file() :
 	global num_word
 
 	if request.method=='GET' :
+		dic1={}
 		text=request.args['url_text']
 		if not text :
 			dic1[text]="입력값 없음"
@@ -93,29 +95,43 @@ def search(lst) :
 		for s in soup('style'): s.extract()
 		my_para = soup.select('body div')
 		
+		result=[]
 			
 		for para in my_para : 
 
 			sen = para.get_text()
-			sen = sen.lower().replace(',',' ').replace('.',' ')
+			#sen = sen.lower().replace(',',' ').replace('.',' ')
 			#translator = str.maketrans('','',string.punctuation)
 			#sen = sen.translate(translator)
-			sen = re.sub('[^0-9a-zA-Zㄱ-힗]', '', sen)
-	
-			tokens = word_tokenize(sen)
-						
-			words = []
-			for word in tokens:
-				word = str(filter(str.isalpha,word))
-				words.append(word)
-	
-			wlist = [k for k in words if not k in stop_words]
+			#sen = re.sub('[^0-9a-zA-Zㄱ-힗]', '', sen)
+			
+			tokenized_text = sent_tokenize(sen)
+			#tokens = word_tokenize(sen)
+			
+			for t in tokenized_text:
+				sentence = word_tokenize(t)
+				words = []
+				
+				for word in sentence:
+					words_ = list(filter(str.isalpha,word))
+					strA = "".join(words_)
+					words.append(strA)
+				
+				for word in words:
+					word = word.lower()
+					if word not in stop_words:
+						if len(word)>2:
+							result.append(word)
+			
+			#wlist = [k for k in words if not k in stop_words]
 			#wlist = sen.split()
 
-			for w in wlist:
-				if w not in word_d:
-					word_d[w]=1
+		for w in result:
+			if w not in word_d:
+				word_d[w]=1
+			else:
 				word_d[w]+=1
+		result = list(set(result))
 	
 		count = 0
 		for w,c in sorted(word_d.items(),key=lambda x:x[1], reverse=False):
