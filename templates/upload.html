@@ -5,7 +5,7 @@
 	<style>
 		* {font-family: Helvetica Neue, Arial, sans-serif; }
 
-		body { background-image: linear-gradient(#ffffff, 30%, #ff9c9c);}
+		body { background-image: #F8E0E0;}
 
 		h1, table { text-align: center; }
 
@@ -20,8 +20,9 @@
 		tr:first-child {background: #ff9c9c; color: white; }
 
 		tr:nth-child(even) { background: #fef8f8;  }
+		tr:not(#firstrow) { background: #fef8f8; color: #ff9c9c; }
 
-		td:empty {background: hsla(50, 25%, 60%, 0.7); }
+		td:empty {background: #fef8f8; }
 
 		tr:hover:not(#firstrow), tr:hover td:empty {background: #ffcaca; pointer-events: visible;}
 		tr:hover:not(#firstrow) { transform: scale(1.2); font-weight: 700; box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.5);}
@@ -44,7 +45,7 @@
 
 		    display: inline-block;
 
-		    font-size: 20px;
+		    font-size: 13px;
 
 		    margin: 4px;
 
@@ -73,7 +74,7 @@
 
 		    display: inline-block;
 
-		    font-size: 15px;
+		    font-size: 13px;
 
 		    margin: 4px;
 
@@ -87,7 +88,7 @@
 		.button1:hover {
 		    background-color: white;
 
-		    color: black;
+		    color: #ff9c9c;
 		}
 
 		#input_sub{
@@ -99,7 +100,7 @@
 </HEAD>
 
 <body>
-	<h1>upload file</h1>
+	<h1 sytle="color: #f78181;">upload file</h1>
 	<div id="input_sub">
 	<form action="http://localhost:8000/upload" method="GET">
 		<input type="text" name="url_text">
@@ -115,14 +116,14 @@
 	</div>
 	<br><br>
 	<!--<h1 style="color:#ff9c9c;">Analysis Results</h1>-->
-	<h1>Analysis Results</h1>
+	<h1 sytle="color: #f78181;">Analysis Results</h1>
 
 	<table id="url_list">
-	<thead><tr>
-		<th>url</th>
-		<th>num of words</th>
+	<thead><tr id="firstrow">
+		<th>URL</th>
+		<th>Num of Words</th>
 		<th>Time</th>
-		<th>cosine similarity</th>
+		<th>Cosine Similarity</th>
 		<th>TF-IDF</th>
 	</tr></thead>
 	<tbody>
@@ -131,7 +132,7 @@
 		<td>{{url_list[i]}}</td>
 		<td>{{num_word[i]}}</td>
 		<td>{{time[i]}}</td>
-		<td><form method="post"><input class="button1" type="submit" value="cosine similarity" name="cosine"></form></td>
+		<td><form method="post"><input class="button1" type="submit" value="Cosine Similarity" name="cosine"></form></td>
 		<td><form method="post"><input class="button1" type="submit" value="TF-IDF" name="tf"></form></td>
 		</tr>
 	{%endfor%}
