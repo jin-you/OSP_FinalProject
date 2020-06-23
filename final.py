@@ -141,10 +141,14 @@ def search(lst) :
 		top_words = []
 		similar_urls = []
 
+		word_list=list(word_d.keys())
+		word_count=list(word_d.values())
+
 		e = {
 			"url":url,
 			"words_num":count,
-			"words":word_d,
+			"words":word_list,
+			"word_count" : word_count,
 			"top_words":top_words,
 			"similar_urls":similar_urls
 		}
