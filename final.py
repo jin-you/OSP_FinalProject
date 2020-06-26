@@ -11,6 +11,7 @@ from nltk.tokenize import word_tokenize
 from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
 import string
+import numpy as np
 
 es_host = "127.0.0.1"
 es_port = "9200"
@@ -21,6 +22,7 @@ url_list=[]
 num_word=[]
 time=[]
 i=0
+word_freq=[]
 
 @app.route('/')
 @app.route('/result')
@@ -74,11 +76,11 @@ def upload_file() :
 			fp.close()
 			search(new)
 			return render_template('result.html', dic=dic2)
-	#return render_template("upload.html", len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 	
 def search(lst) : 
 	global i
 	global num_word
+	global word_freq	
 	
 	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
 
@@ -87,6 +89,7 @@ def search(lst) :
 	for url in lst:
 		
 		word_d = {}
+		word_list=[]		
 
 		res = requests.get(url)
 		html = res.text
@@ -100,13 +103,8 @@ def search(lst) :
 		for para in my_para : 
 
 			sen = para.get_text()
-			#sen = sen.lower().replace(',',' ').replace('.',' ')
-			#translator = str.maketrans('','',string.punctuation)
-			#sen = sen.translate(translator)
-			#sen = re.sub('[^0-9a-zA-Zㄱ-힗]', '', sen)
 			
 			tokenized_text = sent_tokenize(sen)
-			#tokens = word_tokenize(sen)
 			
 			for t in tokenized_text:
 				sentence = word_tokenize(t)
@@ -122,9 +120,7 @@ def search(lst) :
 					if word not in stop_words:
 						if len(word)>2:
 							result.append(word)
-			
-			#wlist = [k for k in words if not k in stop_words]
-			#wlist = sen.split()
+		
 
 		for w in result:
 			if w not in word_d:
@@ -136,19 +132,23 @@ def search(lst) :
 		count = 0
 		for w,c in sorted(word_d.items(),key=lambda x:x[1], reverse=False):
 			count += c
+		
 		num_word.append(count)
 		
 		top_words = []
 		similar_urls = []
+	
 
-		word_list=list(word_d.keys())
-		word_count=list(word_d.values())
+
+		word_freq.append(word_d)
+		#for value in word_d.values() : 
+		#	word_list.append(value)
+		#dictionary_copy=word_d.copy()
+		#word_list.append(dictionary_copy)
 
 		e = {
 			"url":url,
 			"words_num":count,
-			"words":word_list,
-			"word_count" : word_count,
 			"top_words":top_words,
 			"similar_urls":similar_urls
 		}
@@ -160,7 +160,44 @@ def search(lst) :
 
 	
 	return
-		
+
+@app.route('/cossearch', methods=['GET'])
+def cosine_analysis() :
+	global url_list
+	cos_result={}
+
+	if request.method=='GET' : 
+		cos_index=int(request.args['cos_index'])
+		#stan_url=url_list[cos_index]
+		#v_stan=make_vector(cos_index) 	#선택한 링크 벡터 만들어놓음
+
+		for index in range(len(url_list)) : 
+			#if index==cos_index : 
+			#	pass
+			#else : 
+				v_com=make_vector(index, cos_index) #호출해서 링크 분석함
+				v_stan=make_vector(cos_index, index)
+				dotpro=np.dot(v_stan, v_com)
+				cossimil=dotpro / (np.linalg.norm(v_stan) * np.linalg.norm(v_com))
+				cos_result[url_list[index]]=cossimil
+				#result_list.append(cossimil)
+
+	for key, value in cos_result.items() : 
+			print(key, value)
+	return render_template('upload.html', len=len(url_list), url_list=url_list, num_word=num_word, time=time)
+
+def make_vector(index_stan, index_comp) :
+	v=[]
+
+	for w in word_freq[index_comp].keys() : 
+		val=0
+		for t in word_freq[index_stan].keys() : 
+			if t==w :
+				val+=1
+			v.append(val)
+
+	return v
+	
 
 if __name__=='__main__' : 
 	app.run(host='127.0.0.1', port=8000, debug=True)
