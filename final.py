@@ -12,6 +12,7 @@ from nltk.tokenize import sent_tokenize
 from nltk.corpus import stopwords
 import string
 import numpy as np
+import timeit
 
 es_host = "127.0.0.1"
 es_port = "9200"
@@ -23,6 +24,7 @@ num_word=[]
 time=[]
 i=0
 word_freq=[]
+approach=0
 
 @app.route('/')
 @app.route('/result')
@@ -46,10 +48,11 @@ def upload_file() :
 		elif text in url_list : 
 			dic1[text]="중복"
 		else : 
-			url_list.append(text)
 			new=[]
 			new.append(text)
 			search(new)
+			url_list.append(text)
+			time.append(0)
 			dic1[text]="성공"
 		return render_template('result.html', dic=dic1)
 
@@ -72,6 +75,7 @@ def upload_file() :
 					continue;
 				url_list.append(line)
 				new.append(line)
+				time.append(0)
 				dic2[line]="성공"
 			fp.close()
 			search(new)
@@ -163,28 +167,48 @@ def search(lst) :
 
 @app.route('/cossearch', methods=['GET'])
 def cosine_analysis() :
+	global time
 	global url_list
+	global approach
 	cos_result={}
 
+	if len(url_list)<2 : 
+		message="비교 대상이 충분하지 않습니다"
+		return render_template('popup.html', message=message)
+	
 	if request.method=='GET' : 
 		cos_index=int(request.args['cos_index'])
-		#stan_url=url_list[cos_index]
-		#v_stan=make_vector(cos_index) 	#선택한 링크 벡터 만들어놓음
+
+		start_time=timeit.default_timer()
 
 		for index in range(len(url_list)) : 
-			#if index==cos_index : 
-			#	pass
-			#else : 
+			if index==cos_index : 
+				pass
+			else : 
 				v_com=make_vector(index, cos_index) #호출해서 링크 분석함
 				v_stan=make_vector(cos_index, index)
 				dotpro=np.dot(v_stan, v_com)
 				cossimil=dotpro / (np.linalg.norm(v_stan) * np.linalg.norm(v_com))
 				cos_result[url_list[index]]=cossimil
-				#result_list.append(cossimil)
+			
 
-	for key, value in cos_result.items() : 
-			print(key, value)
-	return render_template('upload.html', len=len(url_list), url_list=url_list, num_word=num_word, time=time)
+		terminate_time=timeit.default_timer()
+		
+		time[cos_index]=round(terminate_time - start_time, 4)
+
+	sorted(cos_result.items(), key=lambda x:x[1])
+
+	send_result=[]
+	send_index=0
+
+	for key in cos_result.keys() : 
+		if send_index>2 : 
+			break
+		send_result.append(key)
+		send_index+=1
+	
+	#return render_template('cos_result.html', dic=cos_result)
+	return render_template('cos_result.html', result=send_result)
 
 def make_vector(index_stan, index_comp) :
 	v=[]

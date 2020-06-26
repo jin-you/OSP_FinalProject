@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang=en>
+<head><meta charset="utf-8"></head>
+<body>
+	<script>
+		var result="선택한 URL과 가장 유사한 TOP3 URL\n";
+		var i=1;
+	</script>
+	{% for key in result %}
+	<script>
+		var hi='{{key}}';
+		result=result+"TOP"+i+" : "+hi+"\n";
+		i++;
+	</script>
+	{%endfor%}
+	<script>
+		alert(result);
+		location.href="http://localhost:8000/result";
+	</script>
+</body>
+</html>
