@@ -36,6 +36,7 @@ def render_file() :
 	global time
 	return render_template('upload.html', len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 
+#입력된 URL 
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
 	global url_list
@@ -82,7 +83,8 @@ def upload_file() :
 			fp.close()
 			search(new)
 			return render_template('result.html', dic=dic2)
-	
+
+#URL별 단어 분리 및 저장
 def search(lst) : 
 	global i
 	global num_word
@@ -157,6 +159,7 @@ def search(lst) :
 	
 	return
 
+#COSINE SIMILARITY 분석
 @app.route('/cossearch', methods=['GET'])
 def cosine_analysis() :
 	global time
@@ -224,7 +227,7 @@ def make_vector(index_stan, index_comp) :
 
 	return v
 
-
+#TF_IDF 분석
 @app.route('/tisearch',methods=['GET'])
 def tfidf_analysis():
 	global time
