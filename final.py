@@ -13,6 +13,7 @@ from nltk.corpus import stopwords
 import string
 import numpy as np
 import timeit
+import math
 
 es_host = "127.0.0.1"
 es_port = "9200"
@@ -25,6 +26,7 @@ time=[]
 i=0
 word_freq=[]
 approach=0
+similar_urls=[]
 
 @app.route('/')
 @app.route('/result')
@@ -138,23 +140,13 @@ def search(lst) :
 			count += c
 		
 		num_word.append(count)
-		
-		top_words = []
-		similar_urls = []
-	
-
 
 		word_freq.append(word_d)
-		#for value in word_d.values() : 
-		#	word_list.append(value)
-		#dictionary_copy=word_d.copy()
-		#word_list.append(dictionary_copy)
-
+	
+		similar_urls.append("hi")
 		e = {
 			"url":url,
 			"words_num":count,
-			"top_words":top_words,
-			"similar_urls":similar_urls
 		}
 		res = es.index(index='urls',doc_type='analysis',id=i,body=e)
 		
@@ -169,16 +161,22 @@ def search(lst) :
 def cosine_analysis() :
 	global time
 	global url_list
-	global approach
-	cos_result={}
+	global similar_urls
+	global num_word
 
+	cos_result={}
+	cos_index=0
+
+	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
+	
 	if len(url_list)<2 : 
 		message="비교 대상이 충분하지 않습니다"
 		return render_template('popup.html', message=message)
 	
 	if request.method=='GET' : 
 		cos_index=int(request.args['cos_index'])
-
+		cos_url=url_list[cos_index]
+		
 		start_time=timeit.default_timer()
 
 		for index in range(len(url_list)) : 
@@ -186,7 +184,7 @@ def cosine_analysis() :
 				pass
 			else : 
 				v_com=make_vector(index, cos_index) #호출해서 링크 분석함
-				v_stan=make_vector(cos_index, index)
+				v_stan=make_vector(cos_index, index)	
 				dotpro=np.dot(v_stan, v_com)
 				cossimil=dotpro / (np.linalg.norm(v_stan) * np.linalg.norm(v_com))
 				cos_result[url_list[index]]=cossimil
@@ -195,6 +193,7 @@ def cosine_analysis() :
 		terminate_time=timeit.default_timer()
 		
 		time[cos_index]=round(terminate_time - start_time, 4)
+				
 
 	sorted(cos_result.items(), key=lambda x:x[1])
 
@@ -206,8 +205,14 @@ def cosine_analysis() :
 			break
 		send_result.append(key)
 		send_index+=1
-	
-	#return render_template('cos_result.html', dic=cos_result)
+
+	e = {
+		"url":url_list[cos_index],
+		"words_num":num_word[cos_index],
+		"similar_urls": send_result
+	}
+	res = es.index(index='urls',doc_type='analysis',id=cos_index,body=e)
+
 	return render_template('cos_result.html', result=send_result)
 
 def make_vector(index_stan, index_comp) :
@@ -221,7 +226,10 @@ def make_vector(index_stan, index_comp) :
 			v.append(val)
 
 	return v
-	
+
+
+
+
 
 if __name__=='__main__' : 
 	app.run(host='127.0.0.1', port=8000, debug=True)
