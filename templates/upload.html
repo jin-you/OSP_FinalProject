@@ -132,7 +132,8 @@
 		<td>{{url_list[i]}}</td>
 		<td>{{num_word[i]}}</td>
 		<td>{{time[i]}}</td>
-		<td><form method="post"><input class="button1" type="submit" value="Cosine Similarity" name="cosine"></form></td>
+		<td><form action="http://localhost:8000/cossearch" method="GET"><input type="hidden" name="cos_index" value={{i}}><input class="button1" type="submit" value="Cosine Similarity"></form></td>
+		<!--<td><form method="post"><input class="button1" type="submit" value="Cosine Similarity" name="cosine"></form></td>-->
 		<td><form method="post"><input class="button1" type="submit" value="TF-IDF" name="tf"></form></td>
 		</tr>
 	{%endfor%}
