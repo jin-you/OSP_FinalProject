@@ -225,6 +225,61 @@ def make_vector(index_stan, index_comp) :
 	return v
 
 
+@app.route('/tisearch',methods=['GET'])
+def tfidf_analysis():
+	global time
+	global url_list
+	global approach
+	
+	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
+
+	all_tfidfs = {}
+	
+	if len(url_list)<2 : 
+		message="비교 대상이 충분하지 않습니다"
+		return render_template('popup.html', message=message)
+	
+	if request.method=='GET' : 
+		tf_index=int(request.args['tf_index'])
+
+		start_time=timeit.default_timer()
+
+		tf_res = {}
+		tfidf_result = []
+		
+		for w in word_freq[tf_index].keys():
+			_tf = tf(tf_index,w) #calculate tf
+			_idf = idf(w) #calculate idf
+			tf_res[w]=_tf*_idf #tfidf result
+		sorted(tf_res.items(), key= lambda x:x[1], reverse=True)
+		tfidf_result=list(tf_res.keys())
+
+		all_tfidfs[url_list[tf_index]]=tfidf_result[0:10]
+		
+		terminate_time=timeit.default_timer()
+		time[tf_index]=round(terminate_time-start_time,4)
+
+	doc=es.get(index='urls', doc_type='analysis', id=tf_index)
+	res = es.update(index='urls',doc_type='analysis',id=tf_index,body={'doc':{"top_words":tfidf_result[0:10]}})
+
+	return render_template('tf_result.html',result=tfidf_result[0:10])
+	
+
+def tf(d,w):
+	tfk = word_freq[d]
+	_t = tfk[w]
+	return _t/float(len(word_freq[d].keys()))
+
+def idf(w):
+	
+	doc_freq = 0
+	for idf_index in range(0,len(url_list)):
+		if w in word_freq[idf_index].keys():
+			doc_freq +=1
+
+	return math.log(len(url_list)/float(doc_freq))
+			
+
 
 
 
