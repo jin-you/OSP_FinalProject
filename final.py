@@ -251,13 +251,13 @@ def tfidf_analysis():
 		tfidf_result = []
 		
 		for w in word_freq[tf_index].keys():
-			_tf = tf(tf_index,w) #calculate tf
-			_idf = idf(w) #calculate idf
-			tf_res[w]=_tf*_idf #tfidf result
+			_tf = tf(tf_index,w) #tf값 계산함수 호출
+			_idf = idf(w) #idf값 계산함수 호출
+			tf_res[w]=_tf*_idf #tf_idf 결과 저장
 		sorted(tf_res.items(), key= lambda x:x[1], reverse=True)
 		tfidf_result=list(tf_res.keys())
 
-		all_tfidfs[url_list[tf_index]]=tfidf_result[0:10]
+		all_tfidfs[url_list[tf_index]]=tfidf_result[0:10] 
 		
 		terminate_time=timeit.default_timer()
 		time[tf_index]=round(terminate_time-start_time,4)
@@ -267,12 +267,13 @@ def tfidf_analysis():
 
 	return render_template('tf_result.html',result=tfidf_result[0:10])
 	
-
+#tf값 계산
 def tf(d,w):
 	tfk = word_freq[d]
 	_t = tfk[w]
 	return _t/float(len(word_freq[d].keys()))
 
+#idf값 계산
 def idf(w):
 	
 	doc_freq = 0
