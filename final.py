@@ -25,7 +25,6 @@ num_word=[]
 time=[]
 i=0
 word_freq=[]
-approach=0
 similar_urls=[]
 
 @app.route('/')
@@ -198,12 +197,12 @@ def cosine_analysis() :
 		time[cos_index]=round(terminate_time - start_time, 4)
 				
 
-	sorted(cos_result.items(), key=lambda x:x[1])
+	res_result=sorted(cos_result.items(), key=(lambda x:x[1]), reverse=True)
 
 	send_result=[]
 	send_index=0
 
-	for key in cos_result.keys() : 
+	for key, value in res_result : 
 		if send_index>2 : 
 			break
 		send_result.append(key)
@@ -211,7 +210,7 @@ def cosine_analysis() :
 
 
 	doc=es.get(index='urls', doc_type='analysis', id=cos_index)
-	res = es.update(index='urls',doc_type='analysis',id=cos_index,body={'doc':{"similar_urls":cos_result}})
+	res = es.update(index='urls',doc_type='analysis',id=cos_index,body={'doc':{"similar_urls":send_result}})
 
 	return render_template('cos_result.html', result=send_result)
 
@@ -232,7 +231,6 @@ def make_vector(index_stan, index_comp) :
 def tfidf_analysis():
 	global time
 	global url_list
-	global approach
 	
 	es = Elasticsearch([{'host':es_host,'port':es_port}],timeout=30)
 
