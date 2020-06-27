@@ -206,12 +206,9 @@ def cosine_analysis() :
 		send_result.append(key)
 		send_index+=1
 
-	e = {
-		"url":url_list[cos_index],
-		"words_num":num_word[cos_index],
-		"similar_urls": send_result
-	}
-	res = es.index(index='urls',doc_type='analysis',id=cos_index,body=e)
+
+	doc=es.get(index='urls', doc_type='analysis', id=cos_index)
+	res = es.update(index='urls',doc_type='analysis',id=cos_index,body={'doc':{"similar_urls":cos_result}})
 
 	return render_template('cos_result.html', result=send_result)
 
@@ -226,6 +223,7 @@ def make_vector(index_stan, index_comp) :
 			v.append(val)
 
 	return v
+
 
 
 
