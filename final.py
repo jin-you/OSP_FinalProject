@@ -36,7 +36,7 @@ def render_file() :
 	global time
 	return render_template('upload.html', len=len(url_list), url_list=url_list, num_word=num_word, time=time)
 
-#입력된 URL 
+#입력된 URL 불러오기
 @app.route('/upload', methods=['GET','POST'])
 def upload_file() : 
 	global url_list
