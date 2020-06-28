@@ -279,7 +279,7 @@ def idf(w):
 		if w in word_freq[idf_index].keys():
 			doc_freq +=1
 
-	return math.log(len(url_list)/float(doc_freq))
+	return math.log(len(url_list)/float(doc_freq+1))
 			
 
 
