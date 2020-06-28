@@ -147,7 +147,7 @@ def search(lst) :
 		similar_urls.append("hi")
 		e = {
 			"url":url,
-			"words_num":count,
+			"words_num":count
 		}
 		res = es.index(index='urls',doc_type='analysis',id=i,body=e)
 		
