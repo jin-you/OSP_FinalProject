@@ -1,10 +1,10 @@
 http://vcl.apache.org/
 http://jspwiki.apache.org/
-http://storm.apache.org/
-http://gora.apache.org/
+http://hadoop.apache.org/
+http://tinkerpop.apache.org/
 http://commons.apache.org/
-http://archiva.apache.org/
-https://cayenne.apache.org/
+http://tomcat.apache.org/
+http://climate.apache.org/
 https://flink.apache.org/
 http://whimsical.apache.org/
 http://maven.apache.org/
