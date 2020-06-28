@@ -24,7 +24,7 @@ if [ -f "tf_result.html" ]; then
 	mv tf_result.html templates
 fi
 
-chmod 777 final.py
+sudo chmod 755 final.py
 
 ./final.py
 
