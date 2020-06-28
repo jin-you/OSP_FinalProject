@@ -9,6 +9,7 @@
 
 		h1, table { text-align: center; }
 
+		
 		table {border-collapse: collapse;  width: 70%; margin: 0 auto 5rem;}
 
 		th, td { padding: 1.5rem; font-size: 1.3rem; }
@@ -20,11 +21,11 @@
 		tr:first-child {background: #ff9c9c; color: white; }
 
 		tr:nth-child(even) { background: #fef8f8;  }
-		tr:not(#firstrow) { background: #fef8f8; color: #ff9c9c; }
+		tr:not(#firstrow) {background :#fef8f8; color:#ff9c9c; }
 
 		td:empty {background: #fef8f8; }
 
-		tr:hover:not(#firstrow), tr:hover td:empty {background: #ffcaca; pointer-events: visible;}
+		tr:hover:not(#firstrow), tr:hover td:empty {background: #ffcaca; pointer-events: visible; color: white;}
 		tr:hover:not(#firstrow) { transform: scale(1.2); font-weight: 700; box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.5);}
 
 		.button1 {
@@ -95,12 +96,11 @@
 			text-align : center;	
 		}
 
-
 	</style>
 </HEAD>
 
 <body>
-	<h1 sytle="color: #f78181;">upload file</h1>
+	<h1 sytle="color: #f78181;">Upload File</h1>
 	<div id="input_sub">
 	<form action="http://localhost:8000/upload" method="GET">
 		<input type="text" name="url_text">
